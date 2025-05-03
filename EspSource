@@ -41,7 +41,7 @@ local stringformat = string.format
 local stringlower = string.lower
 
 local ESP = {
-    Enabled = true,
+    Enabled = false,
     Drawings = {},
     Players = {},
     Objects = {},
@@ -53,8 +53,8 @@ local ESP = {
         MaxDistance = 1000,
         TeamCheck = false,
         VisibilityCheck = false,
-        IgnoreInvisible = true,
-        IgnoreDead = true,
+        IgnoreInvisible = false,
+        IgnoreDead = false,
         IgnoreNPCs = false,
         IgnoreFriends = false,
         UseDisplayName = false,
@@ -62,19 +62,19 @@ local ESP = {
         DrawOnTop = true,
         ZIndex = 1,
         RenderPriority = 1,
-        FadeWithDistance = true,
-        VisibilityFade = true,
-        SmoothTransitions = true,
+        FadeWithDistance = false,
+        VisibilityFade = false,
+        SmoothTransitions = false,
         TransitionSpeed = 0.2,
         
-        BoxEnabled = true,
+        BoxEnabled = false,
         BoxType = "2D",
         BoxColor = Color3fromRGB(255, 255, 255),
         BoxTransparency = 0.7,
         BoxThickness = 1,
         BoxFilled = false,
         BoxFilledTransparency = 0.3,
-        BoxOutline = true,
+        BoxOutline = false,
         BoxOutlineColor = Color3fromRGB(0, 0, 0),
         BoxOutlineTransparency = 0.5,
         BoxRoundedRadius = 5,
@@ -83,10 +83,10 @@ local ESP = {
         BoxPadding = Vector3new(0.5, 0.5, 0.5),
         CornerSize = 8,
         
-        NameEnabled = true,
+        NameEnabled = false,
         NameColor = Color3fromRGB(255, 255, 255),
         NameTransparency = 0.7,
-        NameOutline = true,
+        NameOutline = false,
         NameOutlineColor = Color3fromRGB(0, 0, 0),
         NameOutlineTransparency = 0.5,
         NameSize = 14,
@@ -95,10 +95,10 @@ local ESP = {
         NameYOffset = -15,
         NameXOffset = 0,
         
-        DistanceEnabled = true,
+        DistanceEnabled = false,
         DistanceColor = Color3fromRGB(255, 255, 255),
         DistanceTransparency = 0.7,
-        DistanceOutline = true,
+        DistanceOutline = false,
         DistanceOutlineColor = Color3fromRGB(0, 0, 0),
         DistanceOutlineTransparency = 0.5,
         DistanceSize = 13,
@@ -108,7 +108,7 @@ local ESP = {
         DistanceXOffset = 0,
         DistanceTextSize = true,
         
-        HealthEnabled = true,
+        HealthEnabled = false,
         HealthType = "Vertical",
         HealthColor = Color3fromRGB(0, 255, 0),
         HealthTransparency = 0.7,
@@ -122,7 +122,7 @@ local ESP = {
         HealthBarThickness = 2,
         HealthGradient = true,
         
-        TracerEnabled = true,
+        TracerEnabled = false,
         TracerColor = Color3fromRGB(255, 255, 255),
         TracerTransparency = 0.7,
         TracerThickness = 1,
@@ -136,7 +136,7 @@ local ESP = {
         TracerDashSize = 3,
         TracerDashGap = 2,
         
-        ChamsEnabled = true,
+        ChamsEnabled = false,
         ChamsColor = Color3fromRGB(255, 0, 0),
         ChamsTransparency = 0.5,
         ChamsOutlineColor = Color3fromRGB(0, 0, 0),
@@ -147,7 +147,7 @@ local ESP = {
         ChamsOutlineEnabled = true,
         ChamsTeamColor = true,
         
-        SkeletonEnabled = true,
+        SkeletonEnabled = false,
         SkeletonColor = Color3fromRGB(255, 255, 255),
         SkeletonTransparency = 0.7,
         SkeletonThickness = 1,
@@ -158,7 +158,7 @@ local ESP = {
         SkeletonDashSize = 3,
         SkeletonDashGap = 2,
         
-        HeadDotEnabled = true,
+        HeadDotEnabled = false,
         HeadDotColor = Color3fromRGB(255, 0, 0),
         HeadDotTransparency = 0.7,
         HeadDotThickness = 1,
@@ -173,7 +173,7 @@ local ESP = {
         HeadDotPulseSpeed = 1,
         HeadDotPulseSize = 1.5,
         
-        ToolEnabled = true,
+        ToolEnabled = false,
         ToolColor = Color3fromRGB(255, 255, 255),
         ToolTransparency = 0.7,
         ToolOutline = true,
@@ -185,7 +185,7 @@ local ESP = {
         ToolYOffset = 30,
         ToolXOffset = 0,
         
-        StateEnabled = true,
+        StateEnabled = false,
         StateColor = Color3fromRGB(255, 255, 255),
         StateTransparency = 0.7,
         StateOutline = true,
@@ -197,7 +197,7 @@ local ESP = {
         StateYOffset = 45,
         StateXOffset = 0,
         
-        AimPointEnabled = true,
+        AimPointEnabled = false,
         AimPointColor = Color3fromRGB(255, 0, 0),
         AimPointTransparency = 0.7,
         AimPointThickness = 1,
@@ -212,7 +212,7 @@ local ESP = {
         AimPointPulseSpeed = 1,
         AimPointPulseSize = 1.5,
         
-        HitboxEnabled = true,
+        HitboxEnabled = false,
         HitboxColor = Color3fromRGB(255, 0, 0),
         HitboxTransparency = 0.7,
         HitboxThickness = 1,
@@ -224,8 +224,7 @@ local ESP = {
             Legs = true
         },
         
-        -- New Custom Text Settings
-        CustomTextEnabled = true,
+        CustomTextEnabled = false,
         CustomTextColor = Color3fromRGB(255, 255, 255),
         CustomTextTransparency = 0.7,
         CustomTextOutline = true,
@@ -237,7 +236,7 @@ local ESP = {
         CustomTextYOffset = 60,
         CustomTextXOffset = 0,
         
-        TeamColor = true,
+        TeamColor = false,
         EnemyColor = Color3fromRGB(255, 0, 0),
         TeamColorMode = "Team",
         RainbowMode = false,
@@ -530,25 +529,24 @@ function ESP:Get3DBoxCorners(object)
     local size = bounds.Size
     local position = bounds.Position
 
-    -- Get the object's orientation instead of making it face the camera
     local objectCFrame
     if object:IsA("Model") and object.PrimaryPart then
         objectCFrame = object.PrimaryPart.CFrame
     elseif object:IsA("BasePart") then
         objectCFrame = object.CFrame
     else
-        -- If we can't get a proper orientation, use a default one
+        
         objectCFrame = CFramenew(position)
     end
 
-    -- Create a CFrame at the center of the object with its orientation
+
     local cf = CFramenew(position) * (objectCFrame - objectCFrame.Position)
 
     local halfSizeX = size.X / 2
     local halfSizeY = size.Y / 2
     local halfSizeZ = size.Z / 2
 
-    -- Define the 8 corners of the 3D box
+    
     local corners = {
         cf * CFramenew(-halfSizeX, halfSizeY, -halfSizeZ), -- Top Left Back
         cf * CFramenew(halfSizeX, halfSizeY, -halfSizeZ),  -- Top Right Back
@@ -973,7 +971,7 @@ function ESP:CreatePlayerESP(player)
                 Radius = self.Settings.AimPointRadius,
                 ZIndex = self.Settings.ZIndex - 1
             }),
-            -- Add the new CustomText drawing
+           
             CustomText = self:CreateDrawing("Text", {
                 Visible = false,
                 Color = self.Settings.CustomTextColor,
@@ -1062,12 +1060,10 @@ function ESP:CreatePlayerESP(player)
         })
     end
 
-    -- Set up character change connection
+   
     playerData.CharacterConnection = player.CharacterAdded:Connect(function(character)
-        -- When character changes, immediately hide all drawings
         self:HidePlayerESP(playerData)
         
-        -- Reset tracking data
         self._lastPositions[player] = nil
         self._lastAliveStates[player] = nil
     end)
@@ -1080,7 +1076,7 @@ function ESP:RemovePlayerESP(player)
     local playerData = self.Players[player]
 
     if playerData then
-        -- Disconnect character change connection
+       
         if playerData.CharacterConnection then
             playerData.CharacterConnection:Disconnect()
         end
@@ -1109,7 +1105,7 @@ function ESP:RemovePlayerESP(player)
             self:RemoveHighlight(playerData.Drawings.Chams)
         end
         
-        -- Clean up tracking data
+       
         self._lastPositions[player] = nil
         self._lastAliveStates[player] = nil
         
@@ -1136,11 +1132,10 @@ function ESP:UpdatePlayerESP(player)
         return
     end
 
-    -- Check if player is alive
     local isAlive = humanoid.Health > 0
     local wasAlive = self._lastAliveStates[player]
 
-    -- If player just died, hide ESP
+ 
     if wasAlive ~= nil and wasAlive and not isAlive then
         self:HidePlayerESP(playerData)
         self._lastAliveStates[player] = isAlive
@@ -1149,31 +1144,31 @@ function ESP:UpdatePlayerESP(player)
 
     self._lastAliveStates[player] = isAlive
 
-    -- Check if player is dead and we should ignore dead players
+
     if self.Settings.IgnoreDead and not isAlive then
         self:HidePlayerESP(playerData)
         return
     end
 
-    -- Check if player is invisible and we should ignore invisible players
+  
     if self.Settings.IgnoreInvisible and self:IsCharacterInvisible(character) then
         self:HidePlayerESP(playerData)
         return
     end
 
-    -- Check if player is blacklisted
+ 
     if self:IsBlacklisted(player) then
         self:HidePlayerESP(playerData)
         return
     end
 
-    -- Check if whitelist is enabled and player is not whitelisted
+ 
     if self.Settings.Whitelist and #self.Settings.Whitelist > 0 and not self:IsWhitelisted(player) then
         self:HidePlayerESP(playerData)
         return
     end
 
-    -- Check if player is a friend and we should ignore friends
+ 
     if self:IsFriend(player) then
         self:HidePlayerESP(playerData)
         return
@@ -1182,13 +1177,13 @@ function ESP:UpdatePlayerESP(player)
     local position = hrp.Position
     local distance = self:GetDistance(position)
 
-    -- Check if player is too far away
+
     if distance > self.Settings.MaxDistance then
         self:HidePlayerESP(playerData)
         return
     end
 
-    -- Check if player has moved significantly since last update
+  
     local lastPosition = self._lastPositions[player]
     if lastPosition then
         local positionDifference = (lastPosition - position).Magnitude
@@ -1378,7 +1373,7 @@ function ESP:UpdatePlayerESP(player)
         playerData.Drawings.Distance.Visible = false
     end
 
-    -- Add the CustomText display logic
+    
     if self.Settings.CustomTextEnabled then
         local headPos, onScreen, depth = self:WorldToScreen(head.Position)
         local boxCorners = self:GetBoxCorners(character)
@@ -1906,7 +1901,7 @@ function ESP:RemoveObjectESP(object)
     end
 end
 
--- Add the new SetCustomText function
+
 function ESP:SetCustomText(player, textCallback)
     local playerData = self.Players[player]
     if not playerData then return end
@@ -2212,7 +2207,7 @@ function ESP:ToggleHeadDot(enabled)
     return self.Settings.HeadDotEnabled
 end
 
--- Add toggle for CustomText
+
 function ESP:ToggleCustomText(enabled)
     if enabled ~= nil then
         self.Settings.CustomTextEnabled = enabled

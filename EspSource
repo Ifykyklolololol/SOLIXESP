@@ -108,7 +108,7 @@ local ESP = {
         DistanceXOffset = 0,
         DistanceTextSize = true,
         
-        HealthEnabled = false,
+        HealthEnabled = true,
         HealthType = "Vertical",
         HealthColor = Color3fromRGB(0, 255, 0),
         HealthTransparency = 0.7,

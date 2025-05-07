@@ -2399,6 +2399,641 @@ function ESP:SetRainbowSpeed(speed)
     return speed
 end
 
+function ESP:AddObjectESP(path, options)
+    -- Find the object by path
+    local object = game:GetService("Workspace"):FindFirstChild(path, true)
+    
+    if not object then
+        warn("Object not found: " .. path)
+        return false
+    end
+    
+    -- Create a unique ID for this object
+    local objectId = tostring(object:GetFullName())
+    
+    -- Check if object already has ESP
+    if self.Objects[objectId] then
+        self:RemoveObjectESP(self.Objects[objectId].Object)
+    end
+    
+    -- Default options
+    options = options or {}
+    
+    -- Create object data with all possible ESP drawings
+    local objectData = {
+        Object = object,
+        Settings = {
+            -- Copy global settings but allow overrides
+            BoxEnabled = options.BoxEnabled ~= nil and options.BoxEnabled or self.Settings.BoxEnabled,
+            BoxType = options.BoxType or self.Settings.BoxType,
+            BoxColor = options.BoxColor or self.Settings.BoxColor,
+            BoxTransparency = options.BoxTransparency or self.Settings.BoxTransparency,
+            BoxThickness = options.BoxThickness or self.Settings.BoxThickness,
+            BoxFilled = options.BoxFilled ~= nil and options.BoxFilled or self.Settings.BoxFilled,
+            BoxFilledTransparency = options.BoxFilledTransparency or self.Settings.BoxFilledTransparency,
+            BoxOutline = options.BoxOutline ~= nil and options.BoxOutline or self.Settings.BoxOutline,
+            BoxOutlineColor = options.BoxOutlineColor or self.Settings.BoxOutlineColor,
+            BoxOutlineTransparency = options.BoxOutlineTransparency or self.Settings.BoxOutlineTransparency,
+            CornerSize = options.CornerSize or self.Settings.CornerSize,
+            
+            NameEnabled = options.NameEnabled ~= nil and options.NameEnabled or false,
+            NameText = options.NameText or object.Name,
+            NameColor = options.NameColor or self.Settings.NameColor,
+            NameTransparency = options.NameTransparency or self.Settings.NameTransparency,
+            NameOutline = options.NameOutline ~= nil and options.NameOutline or self.Settings.NameOutline,
+            NameOutlineColor = options.NameOutlineColor or self.Settings.NameOutlineColor,
+            NameOutlineTransparency = options.NameOutlineTransparency or self.Settings.NameOutlineTransparency,
+            NameSize = options.NameSize or self.Settings.NameSize,
+            NameFont = options.NameFont or self.Settings.NameFont,
+            NamePosition = options.NamePosition or self.Settings.NamePosition,
+            NameYOffset = options.NameYOffset or self.Settings.NameYOffset,
+            NameXOffset = options.NameXOffset or self.Settings.NameXOffset,
+            
+            DistanceEnabled = options.DistanceEnabled ~= nil and options.DistanceEnabled or false,
+            DistanceColor = options.DistanceColor or self.Settings.DistanceColor,
+            DistanceTransparency = options.DistanceTransparency or self.Settings.DistanceTransparency,
+            DistanceOutline = options.DistanceOutline ~= nil and options.DistanceOutline or self.Settings.DistanceOutline,
+            DistanceOutlineColor = options.DistanceOutlineColor or self.Settings.DistanceOutlineColor,
+            DistanceOutlineTransparency = options.DistanceOutlineTransparency or self.Settings.DistanceOutlineTransparency,
+            DistanceSize = options.DistanceSize or self.Settings.DistanceSize,
+            DistanceFont = options.DistanceFont or self.Settings.DistanceFont,
+            DistancePosition = options.DistancePosition or self.Settings.DistancePosition,
+            DistanceYOffset = options.DistanceYOffset or self.Settings.DistanceYOffset,
+            DistanceXOffset = options.DistanceXOffset or self.Settings.DistanceXOffset,
+            
+            TracerEnabled = options.TracerEnabled ~= nil and options.TracerEnabled or false,
+            TracerColor = options.TracerColor or self.Settings.TracerColor,
+            TracerTransparency = options.TracerTransparency or self.Settings.TracerTransparency,
+            TracerThickness = options.TracerThickness or self.Settings.TracerThickness,
+            TracerOutline = options.TracerOutline ~= nil and options.TracerOutline or self.Settings.TracerOutline,
+            TracerOutlineColor = options.TracerOutlineColor or self.Settings.TracerOutlineColor,
+            TracerOutlineTransparency = options.TracerOutlineTransparency or self.Settings.TracerOutlineTransparency,
+            TracerOrigin = options.TracerOrigin or self.Settings.TracerOrigin,
+            TracerYOffset = options.TracerYOffset or self.Settings.TracerYOffset,
+            TracerXOffset = options.TracerXOffset or self.Settings.TracerXOffset,
+            TracerStyle = options.TracerStyle or self.Settings.TracerStyle,
+            TracerDashSize = options.TracerDashSize or self.Settings.TracerDashSize,
+            TracerDashGap = options.TracerDashGap or self.Settings.TracerDashGap,
+            
+            ChamsEnabled = options.ChamsEnabled ~= nil and options.ChamsEnabled or false,
+            ChamsColor = options.ChamsColor or self.Settings.ChamsColor,
+            ChamsTransparency = options.ChamsTransparency or self.Settings.ChamsTransparency,
+            ChamsOutlineColor = options.ChamsOutlineColor or self.Settings.ChamsOutlineColor,
+            ChamsOutlineTransparency = options.ChamsOutlineTransparency or self.Settings.ChamsOutlineTransparency,
+            ChamsOutlineEnabled = options.ChamsOutlineEnabled ~= nil and options.ChamsOutlineEnabled or self.Settings.ChamsOutlineEnabled,
+            ChamsDepthMode = options.ChamsDepthMode or self.Settings.ChamsDepthMode,
+            
+            CustomTextEnabled = options.CustomTextEnabled ~= nil and options.CustomTextEnabled or false,
+            CustomText = options.CustomText or "",
+            CustomTextColor = options.CustomTextColor or self.Settings.CustomTextColor,
+            CustomTextTransparency = options.CustomTextTransparency or self.Settings.CustomTextTransparency,
+            CustomTextOutline = options.CustomTextOutline ~= nil and options.CustomTextOutline or self.Settings.CustomTextOutline,
+            CustomTextOutlineColor = options.CustomTextOutlineColor or self.Settings.CustomTextOutlineColor,
+            CustomTextOutlineTransparency = options.CustomTextOutlineTransparency or self.Settings.CustomTextOutlineTransparency,
+            CustomTextSize = options.CustomTextSize or self.Settings.CustomTextSize,
+            CustomTextFont = options.CustomTextFont or self.Settings.CustomTextFont,
+            CustomTextPosition = options.CustomTextPosition or self.Settings.CustomTextPosition,
+            CustomTextYOffset = options.CustomTextYOffset or self.Settings.CustomTextYOffset,
+            CustomTextXOffset = options.CustomTextXOffset or self.Settings.CustomTextXOffset,
+        },
+        Drawings = {}
+    }
+    
+    -- Create all the necessary drawings based on the ESP types
+    
+    -- Box ESP
+    if objectData.Settings.BoxType == "2D" then
+        objectData.Drawings.Box = self:CreateDrawing("Square", {
+            Visible = false,
+            Color = objectData.Settings.BoxColor,
+            Thickness = objectData.Settings.BoxThickness,
+            Transparency = objectData.Settings.BoxTransparency,
+            Filled = objectData.Settings.BoxFilled,
+            ZIndex = self.Settings.ZIndex
+        })
+        
+        objectData.Drawings.BoxOutline = self:CreateDrawing("Square", {
+            Visible = false,
+            Color = objectData.Settings.BoxOutlineColor,
+            Thickness = objectData.Settings.BoxThickness + 2,
+            Transparency = objectData.Settings.BoxOutlineTransparency,
+            Filled = false,
+            ZIndex = self.Settings.ZIndex - 1
+        })
+        
+        objectData.Drawings.BoxFill = self:CreateDrawing("Square", {
+            Visible = false,
+            Color = objectData.Settings.BoxColor,
+            Transparency = objectData.Settings.BoxFilledTransparency,
+            Filled = true,
+            ZIndex = self.Settings.ZIndex - 2
+        })
+    elseif objectData.Settings.BoxType == "Corner" then
+        objectData.Drawings.BoxCorners = {}
+        
+        for i = 1, 8 do
+            objectData.Drawings.BoxCorners[i] = {
+                Line = self:CreateDrawing("Line", {
+                    Visible = false,
+                    Color = objectData.Settings.BoxColor,
+                    Thickness = objectData.Settings.BoxThickness,
+                    Transparency = objectData.Settings.BoxTransparency,
+                    ZIndex = self.Settings.ZIndex
+                }),
+                Outline = self:CreateDrawing("Line", {
+                    Visible = false,
+                    Color = objectData.Settings.BoxOutlineColor,
+                    Thickness = objectData.Settings.BoxThickness + 2,
+                    Transparency = objectData.Settings.BoxOutlineTransparency,
+                    ZIndex = self.Settings.ZIndex - 1
+                })
+            }
+        end
+    elseif objectData.Settings.BoxType == "3D" then
+        objectData.Drawings.Box3D = {}
+        
+        for i = 1, 12 do
+            objectData.Drawings.Box3D[i] = {
+                Line = self:CreateDrawing("Line", {
+                    Visible = false,
+                    Color = objectData.Settings.BoxColor,
+                    Thickness = objectData.Settings.BoxThickness,
+                    Transparency = objectData.Settings.BoxTransparency,
+                    ZIndex = self.Settings.ZIndex
+                }),
+                Outline = self:CreateDrawing("Line", {
+                    Visible = false,
+                    Color = objectData.Settings.BoxOutlineColor,
+                    Thickness = objectData.Settings.BoxThickness + 2,
+                    Transparency = objectData.Settings.BoxOutlineTransparency,
+                    ZIndex = self.Settings.ZIndex - 1
+                })
+            }
+        end
+    end
+    
+    -- Name ESP
+    if objectData.Settings.NameEnabled then
+        objectData.Drawings.Name = self:CreateDrawing("Text", {
+            Visible = false,
+            Color = objectData.Settings.NameColor,
+            Transparency = objectData.Settings.NameTransparency,
+            Size = objectData.Settings.NameSize,
+            Center = true,
+            Outline = objectData.Settings.NameOutline,
+            OutlineColor = objectData.Settings.NameOutlineColor,
+            Font = objectData.Settings.NameFont,
+            ZIndex = self.Settings.ZIndex
+        })
+    end
+    
+    -- Distance ESP
+    if objectData.Settings.DistanceEnabled then
+        objectData.Drawings.Distance = self:CreateDrawing("Text", {
+            Visible = false,
+            Color = objectData.Settings.DistanceColor,
+            Transparency = objectData.Settings.DistanceTransparency,
+            Size = objectData.Settings.DistanceSize,
+            Center = true,
+            Outline = objectData.Settings.DistanceOutline,
+            OutlineColor = objectData.Settings.DistanceOutlineColor,
+            Font = objectData.Settings.DistanceFont,
+            ZIndex = self.Settings.ZIndex
+        })
+    end
+    
+  
+    if objectData.Settings.TracerEnabled then
+        objectData.Drawings.Tracer = self:CreateDrawing("Line", {
+            Visible = false,
+            Color = objectData.Settings.TracerColor,
+            Thickness = objectData.Settings.TracerThickness,
+            Transparency = objectData.Settings.TracerTransparency,
+            ZIndex = self.Settings.ZIndex
+        })
+        
+        objectData.Drawings.TracerOutline = self:CreateDrawing("Line", {
+            Visible = false,
+            Color = objectData.Settings.TracerOutlineColor,
+            Thickness = objectData.Settings.TracerThickness + 2,
+            Transparency = objectData.Settings.TracerOutlineTransparency,
+            ZIndex = self.Settings.ZIndex - 1
+        })
+        
+        objectData.Drawings.TracerDashed = {}
+    end
+    
+
+    if objectData.Settings.ChamsEnabled then
+        objectData.Drawings.Chams = self:CreateHighlight()
+    end
+    
+ 
+    if objectData.Settings.CustomTextEnabled then
+        objectData.Drawings.CustomText = self:CreateDrawing("Text", {
+            Visible = false,
+            Color = objectData.Settings.CustomTextColor,
+            Transparency = objectData.Settings.CustomTextTransparency,
+            Size = objectData.Settings.CustomTextSize,
+            Center = true,
+            Outline = objectData.Settings.CustomTextOutline,
+            OutlineColor = objectData.Settings.CustomTextOutlineColor,
+            Font = objectData.Settings.CustomTextFont,
+            ZIndex = self.Settings.ZIndex
+        })
+    end
+    
+  
+    objectData.UpdateConnection = game:GetService("RunService").RenderStepped:Connect(function()
+        self:UpdateObjectESP(object)
+    end)
+    
+   
+    self.Objects[objectId] = objectData
+    
+    return objectData
+end
+
+
+function ESP:UpdateObjectESP(object)
+    local objectId = tostring(object:GetFullName())
+    local objectData = self.Objects[objectId]
+    
+    if not objectData then return end
+    
+  
+    if not object or not object.Parent then
+        self:RemoveObjectESP(object)
+        return
+    end
+    
+   
+    if not self.Enabled then
+        self:HideObjectESP(objectData)
+        return
+    end
+    
+   
+    local position
+    if object:IsA("Model") and object.PrimaryPart then
+        position = object.PrimaryPart.Position
+    elseif object:IsA("BasePart") then
+        position = object.Position
+    else
+        
+        local part = object:FindFirstChildWhichIsA("BasePart")
+        if part then
+            position = part.Position
+        else
+            self:HideObjectESP(objectData)
+            return
+        end
+    end
+    
+   
+    local distance = self:GetDistance(position)
+    if distance > self.Settings.MaxDistance then
+        self:HideObjectESP(objectData)
+        return
+    end
+    
+  
+    local transparency = self:CalculateTransparency(distance)
+    
+   
+    if objectData.Settings.BoxEnabled then
+        local boxCorners = self:GetBoxCorners(object)
+        
+        
+        if objectData.Drawings.Box then
+            objectData.Drawings.Box.Visible = false
+            objectData.Drawings.BoxOutline.Visible = false
+            objectData.Drawings.BoxFill.Visible = false
+        end
+        
+        if objectData.Drawings.BoxCorners then
+            for _, corner in pairs(objectData.Drawings.BoxCorners) do
+                corner.Line.Visible = false
+                corner.Outline.Visible = false
+            end
+        end
+        
+        if objectData.Drawings.Box3D then
+            for _, line in pairs(objectData.Drawings.Box3D) do
+                line.Line.Visible = false
+                line.Outline.Visible = false
+            end
+        end
+        
+        if boxCorners then
+            local topLeft = boxCorners.TopLeft
+            local bottomRight = boxCorners.BottomRight
+            local boxSize = bottomRight - topLeft
+            
+            if objectData.Settings.BoxType == "2D" and objectData.Drawings.Box then
+                objectData.Drawings.Box.Position = topLeft
+                objectData.Drawings.Box.Size = boxSize
+                objectData.Drawings.Box.Color = objectData.Settings.BoxColor
+                objectData.Drawings.Box.Transparency = transparency * objectData.Settings.BoxTransparency
+                objectData.Drawings.Box.Visible = true
+                
+                if objectData.Settings.BoxOutline then
+                    objectData.Drawings.BoxOutline.Position = topLeft
+                    objectData.Drawings.BoxOutline.Size = boxSize
+                    objectData.Drawings.BoxOutline.Transparency = transparency * objectData.Settings.BoxOutlineTransparency
+                    objectData.Drawings.BoxOutline.Visible = true
+                end
+                
+                if objectData.Settings.BoxFilled then
+                    objectData.Drawings.BoxFill.Position = topLeft
+                    objectData.Drawings.BoxFill.Size = boxSize
+                    objectData.Drawings.BoxFill.Color = objectData.Settings.BoxColor
+                    objectData.Drawings.BoxFill.Transparency = transparency * objectData.Settings.BoxFilledTransparency
+                    objectData.Drawings.BoxFill.Visible = true
+                end
+            elseif objectData.Settings.BoxType == "Corner" and objectData.Drawings.BoxCorners then
+                local cornerPoints = self:GetCornerBoxPoints(boxCorners)
+                
+                if cornerPoints then
+                    for i, points in ipairs(cornerPoints) do
+                        if i <= #objectData.Drawings.BoxCorners then
+                            objectData.Drawings.BoxCorners[i].Line.From = points[1]
+                            objectData.Drawings.BoxCorners[i].Line.To = points[2]
+                            objectData.Drawings.BoxCorners[i].Line.Color = objectData.Settings.BoxColor
+                            objectData.Drawings.BoxCorners[i].Line.Transparency = transparency * objectData.Settings.BoxTransparency
+                            objectData.Drawings.BoxCorners[i].Line.Visible = true
+                            
+                            if objectData.Settings.BoxOutline then
+                                objectData.Drawings.BoxCorners[i].Outline.From = points[1]
+                                objectData.Drawings.BoxCorners[i].Outline.To = points[2]
+                                objectData.Drawings.BoxCorners[i].Outline.Transparency = transparency * objectData.Settings.BoxOutlineTransparency
+                                objectData.Drawings.BoxCorners[i].Outline.Visible = true
+                            end
+                        end
+                    end
+                end
+            elseif objectData.Settings.BoxType == "3D" and objectData.Drawings.Box3D then
+                local corners3D = self:Get3DBoxCorners(object)
+                
+                if corners3D then
+                    local edges = {
+                        {1, 2}, {2, 4}, {4, 3}, {3, 1},
+                        {5, 6}, {6, 8}, {8, 7}, {7, 5},
+                        {1, 5}, {2, 6}, {3, 7}, {4, 8}
+                    }
+                    
+                    for i, edge in ipairs(edges) do
+                        if i <= #objectData.Drawings.Box3D then
+                            objectData.Drawings.Box3D[i].Line.From = corners3D[edge[1]]
+                            objectData.Drawings.Box3D[i].Line.To = corners3D[edge[2]]
+                            objectData.Drawings.Box3D[i].Line.Color = objectData.Settings.BoxColor
+                            objectData.Drawings.Box3D[i].Line.Transparency = transparency * objectData.Settings.BoxTransparency
+                            objectData.Drawings.Box3D[i].Line.Visible = true
+                            
+                            if objectData.Settings.BoxOutline then
+                                objectData.Drawings.Box3D[i].Outline.From = corners3D[edge[1]]
+                                objectData.Drawings.Box3D[i].Outline.To = corners3D[edge[2]]
+                                objectData.Drawings.Box3D[i].Outline.Transparency = transparency * objectData.Settings.BoxOutlineTransparency
+                                objectData.Drawings.Box3D[i].Outline.Visible = true
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    else
+       
+        if objectData.Drawings.Box then
+            objectData.Drawings.Box.Visible = false
+            objectData.Drawings.BoxOutline.Visible = false
+            objectData.Drawings.BoxFill.Visible = false
+        end
+        
+        if objectData.Drawings.BoxCorners then
+            for _, corner in pairs(objectData.Drawings.BoxCorners) do
+                corner.Line.Visible = false
+                corner.Outline.Visible = false
+            end
+        end
+        
+        if objectData.Drawings.Box3D then
+            for _, line in pairs(objectData.Drawings.Box3D) do
+                line.Line.Visible = false
+                line.Outline.Visible = false
+            end
+        end
+    end
+    
+    
+    if objectData.Settings.NameEnabled and objectData.Drawings.Name then
+        local screenPos, onScreen, depth = self:WorldToScreen(position)
+        local boxCorners = self:GetBoxCorners(object)
+        
+        if onScreen then
+            local textSize = self:CalculateTextSize(distance)
+            local namePosition = self:CalculatePosition(
+                objectData.Settings.NamePosition, 
+                boxCorners, 
+                screenPos, 
+                objectData.Settings.NameXOffset, 
+                objectData.Settings.NameYOffset
+            )
+            
+            objectData.Drawings.Name.Position = namePosition
+            objectData.Drawings.Name.Text = objectData.Settings.NameText
+            objectData.Drawings.Name.Color = objectData.Settings.NameColor
+            objectData.Drawings.Name.Transparency = transparency * objectData.Settings.NameTransparency
+            objectData.Drawings.Name.Size = textSize
+            objectData.Drawings.Name.Visible = true
+        else
+            objectData.Drawings.Name.Visible = false
+        end
+    elseif objectData.Drawings.Name then
+        objectData.Drawings.Name.Visible = false
+    end
+    
+  
+    if objectData.Settings.DistanceEnabled and objectData.Drawings.Distance then
+        local screenPos, onScreen, depth = self:WorldToScreen(position)
+        local boxCorners = self:GetBoxCorners(object)
+        
+        if onScreen then
+            local distanceText = self:GetDistanceText(distance)
+            local textSize = self:CalculateTextSize(distance)
+            local distancePosition = self:CalculatePosition(
+                objectData.Settings.DistancePosition, 
+                boxCorners, 
+                screenPos, 
+                objectData.Settings.DistanceXOffset, 
+                objectData.Settings.DistanceYOffset
+            )
+            
+            objectData.Drawings.Distance.Position = distancePosition
+            objectData.Drawings.Distance.Text = distanceText
+            objectData.Drawings.Distance.Color = objectData.Settings.DistanceColor
+            objectData.Drawings.Distance.Transparency = transparency * objectData.Settings.DistanceTransparency
+            objectData.Drawings.Distance.Size = textSize
+            objectData.Drawings.Distance.Visible = true
+        else
+            objectData.Drawings.Distance.Visible = false
+        end
+    elseif objectData.Drawings.Distance then
+        objectData.Drawings.Distance.Visible = false
+    end
+    
+   
+    if objectData.Settings.TracerEnabled and objectData.Drawings.Tracer then
+        local screenPos, onScreen, depth = self:WorldToScreen(position)
+        
+        if onScreen then
+            local from
+            
+            if objectData.Settings.TracerOrigin == "Bottom" then
+                from = Vector2new(Camera.ViewportSize.X / 2 + objectData.Settings.TracerXOffset, Camera.ViewportSize.Y + objectData.Settings.TracerYOffset)
+            elseif objectData.Settings.TracerOrigin == "Center" then
+                from = Vector2new(Camera.ViewportSize.X / 2 + objectData.Settings.TracerXOffset, Camera.ViewportSize.Y / 2 + objectData.Settings.TracerYOffset)
+            elseif objectData.Settings.TracerOrigin == "Mouse" then
+                from = UserInputService:GetMouseLocation() + Vector2new(objectData.Settings.TracerXOffset, objectData.Settings.TracerYOffset)
+            end
+            
+            for _, line in pairs(objectData.Drawings.TracerDashed) do
+                self:RemoveDrawing(line)
+            end
+            objectData.Drawings.TracerDashed = {}
+            
+            if objectData.Settings.TracerStyle == "Line" then
+                objectData.Drawings.Tracer.From = from
+                objectData.Drawings.Tracer.To = screenPos
+                objectData.Drawings.Tracer.Color = objectData.Settings.TracerColor
+                objectData.Drawings.Tracer.Transparency = transparency * objectData.Settings.TracerTransparency
+                objectData.Drawings.Tracer.Visible = true
+                
+                if objectData.Settings.TracerOutline then
+                    objectData.Drawings.TracerOutline.From = from
+                    objectData.Drawings.TracerOutline.To = screenPos
+                    objectData.Drawings.TracerOutline.Transparency = transparency * objectData.Settings.TracerOutlineTransparency
+                    objectData.Drawings.TracerOutline.Visible = true
+                else
+                    objectData.Drawings.TracerOutline.Visible = false
+                end
+            elseif objectData.Settings.TracerStyle == "Dashed" or objectData.Settings.TracerStyle == "Dotted" then
+                objectData.Drawings.Tracer.Visible = false
+                objectData.Drawings.TracerOutline.Visible = false
+                
+                local dashSize = objectData.Settings.TracerStyle == "Dotted" and 1 or objectData.Settings.TracerDashSize
+                local gapSize = objectData.Settings.TracerDashGap
+                
+                objectData.Drawings.TracerDashed = self:DrawDashedLine(
+                    from, 
+                    screenPos, 
+                    dashSize, 
+                    gapSize, 
+                    objectData.Settings.TracerColor, 
+                    objectData.Settings.TracerThickness, 
+                    transparency * objectData.Settings.TracerTransparency, 
+                    self.Settings.ZIndex
+                )
+            end
+        else
+            objectData.Drawings.Tracer.Visible = false
+            objectData.Drawings.TracerOutline.Visible = false
+            
+            for _, line in pairs(objectData.Drawings.TracerDashed) do
+                line.Visible = false
+            end
+        end
+    elseif objectData.Drawings.Tracer then
+        objectData.Drawings.Tracer.Visible = false
+        objectData.Drawings.TracerOutline.Visible = false
+        
+        for _, line in pairs(objectData.Drawings.TracerDashed or {}) do
+            line.Visible = false
+        end
+    end
+    
+   
+    if objectData.Settings.ChamsEnabled and objectData.Drawings.Chams then
+        local highlight = objectData.Drawings.Chams
+        
+        if highlight then
+            highlight.Adornee = object
+            highlight.Enabled = true
+            highlight.FillColor = objectData.Settings.ChamsColor
+            highlight.FillTransparency = 1 - (transparency * (1 - objectData.Settings.ChamsTransparency))
+            
+            if objectData.Settings.ChamsOutlineEnabled then
+                highlight.OutlineColor = objectData.Settings.ChamsOutlineColor
+                highlight.OutlineTransparency = 1 - (transparency * (1 - objectData.Settings.ChamsOutlineTransparency))
+            else
+                highlight.OutlineTransparency = 1
+            end
+            
+            if objectData.Settings.ChamsDepthMode == "Occluded" then
+                highlight.DepthMode = Enum.HighlightDepthMode.Occluded
+            elseif objectData.Settings.ChamsDepthMode == "AlwaysOnTop" then
+                highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+            end
+        end
+    elseif objectData.Drawings.Chams then
+        objectData.Drawings.Chams.Enabled = false
+    end
+    
+    
+    if objectData.Settings.CustomTextEnabled and objectData.Drawings.CustomText then
+        local screenPos, onScreen, depth = self:WorldToScreen(position)
+        local boxCorners = self:GetBoxCorners(object)
+        
+        if onScreen then
+            local textSize = self:CalculateTextSize(distance)
+            local customTextPosition = self:CalculatePosition(
+                objectData.Settings.CustomTextPosition, 
+                boxCorners, 
+                screenPos, 
+                objectData.Settings.CustomTextXOffset, 
+                objectData.Settings.CustomTextYOffset
+            )
+            
+            objectData.Drawings.CustomText.Position = customTextPosition
+            objectData.Drawings.CustomText.Text = objectData.Settings.CustomText
+            objectData.Drawings.CustomText.Color = objectData.Settings.CustomTextColor
+            objectData.Drawings.CustomText.Transparency = transparency * objectData.Settings.CustomTextTransparency
+            objectData.Drawings.CustomText.Size = textSize
+            objectData.Drawings.CustomText.Visible = true
+        else
+            objectData.Drawings.CustomText.Visible = false
+        end
+    elseif objectData.Drawings.CustomText then
+        objectData.Drawings.CustomText.Visible = false
+    end
+end
+
+-- Add a helper function to hide object ESP
+function ESP:HideObjectESP(objectData)
+    for _, drawing in pairs(objectData.Drawings) do
+        if type(drawing) == "table" then
+            if drawing.Line then
+                drawing.Line.Visible = false
+                drawing.Outline.Visible = false
+            else
+                for _, subDrawing in pairs(drawing) do
+                    if type(subDrawing) == "table" then
+                        subDrawing.Line.Visible = false
+                        subDrawing.Outline.Visible = false
+                    elseif subDrawing ~= objectData.Drawings.Chams then
+                        subDrawing.Visible = false
+                    end
+                end
+            end
+        elseif drawing ~= objectData.Drawings.Chams then
+            drawing.Visible = false
+        end
+    end
+
+    if objectData.Drawings.Chams then
+        objectData.Drawings.Chams.Enabled = false
+    end
+end
+
 function ESP:SetTransparency(transparency)
     self.Settings.BoxTransparency = transparency
     self.Settings.NameTransparency = transparency

@@ -1915,221 +1915,49 @@ function ESP:SetCustomText(player, textCallback)
     return true
 end
 
--- Function to add ESP to any object by path
-function ESP:AddObjectESP(objectPath, customOptions)
-    customOptions = customOptions or {}
-    
-    -- Find the object from path string
-    local function GetObjectFromPath(path)
-        local parts = {}
-        for part in string.gmatch(path, "[^%.]+") do
-            table.insert(parts, part)
+-- Modify the ESP:Init() function to include object ESP updates in the RenderStepped loop
+
+function ESP:Init()
+    self.Connections.PlayerAdded = Players.PlayerAdded:Connect(function(player)
+        self:CreatePlayerESP(player)
+    end)
+
+    self.Connections.PlayerRemoving = Players.PlayerRemoving:Connect(function(player)
+        self:RemovePlayerESP(player)
+    end)
+
+    self.Connections.RenderStepped = RunService.RenderStepped:Connect(function()
+        if not self.Enabled then return end
+        
+        if self.Settings.RainbowMode then
+            self._rainbow = (self._rainbow + self.Settings.RainbowSpeed * 0.01) % 1
         end
         
-        local current = game
-        for i, part in ipairs(parts) do
-            if not current then return nil end
-            current = current[part] or current:FindFirstChild(part)
+        self._pulse = (self._pulse + 0.05) % (mathpi * 2)
+        
+        -- Update player ESP
+        for player, playerData in pairs(self.Players) do
+            self:UpdatePlayerESP(player)
         end
         
-        return current
-    end
-    
-    local object = GetObjectFromPath(objectPath)
-    if not object then
-        warn("ESP: Object not found at path: " .. objectPath)
-        return nil
-    end
-    
-    -- Generate a unique ID for this object
-    local objectId = objectPath:gsub("%.", "_") .. "_" .. tostring(os.time())
-    
-    -- Create object ESP data structure
-    local objectData = {
-        Object = object,
-        Options = {
-            BoxEnabled = customOptions.BoxEnabled ~= nil and customOptions.BoxEnabled or true,
-            BoxType = customOptions.BoxType or self.Settings.BoxType,
-            BoxColor = customOptions.BoxColor or self.Settings.BoxColor,
-            BoxTransparency = customOptions.BoxTransparency or self.Settings.BoxTransparency,
-            BoxThickness = customOptions.BoxThickness or self.Settings.BoxThickness,
-            BoxFilled = customOptions.BoxFilled ~= nil and customOptions.BoxFilled or self.Settings.BoxFilled,
-            
-            NameEnabled = customOptions.NameEnabled ~= nil and customOptions.NameEnabled or true,
-            NameText = customOptions.NameText or object.Name,
-            NameColor = customOptions.NameColor or self.Settings.NameColor,
-            NameTransparency = customOptions.NameTransparency or self.Settings.NameTransparency,
-            NameSize = customOptions.NameSize or self.Settings.NameSize,
-            NamePosition = customOptions.NamePosition or self.Settings.NamePosition,
-            NameYOffset = customOptions.NameYOffset or self.Settings.NameYOffset,
-            NameXOffset = customOptions.NameXOffset or self.Settings.NameXOffset,
-            
-            TracerEnabled = customOptions.TracerEnabled ~= nil and customOptions.TracerEnabled or false,
-            TracerColor = customOptions.TracerColor or self.Settings.TracerColor,
-            TracerTransparency = customOptions.TracerTransparency or self.Settings.TracerTransparency,
-            TracerThickness = customOptions.TracerThickness or self.Settings.TracerThickness,
-            TracerOrigin = customOptions.TracerOrigin or self.Settings.TracerOrigin,
-            
-            DistanceEnabled = customOptions.DistanceEnabled ~= nil and customOptions.DistanceEnabled or true,
-            DistanceColor = customOptions.DistanceColor or self.Settings.DistanceColor,
-            DistanceTransparency = customOptions.DistanceTransparency or self.Settings.DistanceTransparency,
-            DistanceSize = customOptions.DistanceSize or self.Settings.DistanceSize,
-            
-            ChamsEnabled = customOptions.ChamsEnabled ~= nil and customOptions.ChamsEnabled or false,
-            ChamsColor = customOptions.ChamsColor or self.Settings.ChamsColor,
-            ChamsTransparency = customOptions.ChamsTransparency or self.Settings.ChamsTransparency,
-            
-            CustomTextEnabled = customOptions.CustomTextEnabled ~= nil and customOptions.CustomTextEnabled or false,
-            CustomText = customOptions.CustomText or "",
-            CustomTextColor = customOptions.CustomTextColor or self.Settings.CustomTextColor,
-            CustomTextTransparency = customOptions.CustomTextTransparency or self.Settings.CustomTextTransparency,
-            CustomTextSize = customOptions.CustomTextSize or self.Settings.CustomTextSize,
-            CustomTextPosition = customOptions.CustomTextPosition or self.Settings.CustomTextPosition,
-            CustomTextYOffset = customOptions.CustomTextYOffset or self.Settings.CustomTextYOffset,
-            CustomTextXOffset = customOptions.CustomTextXOffset or self.Settings.CustomTextXOffset,
-            
-            MaxDistance = customOptions.MaxDistance or self.Settings.MaxDistance,
-            VisibilityCheck = customOptions.VisibilityCheck ~= nil and customOptions.VisibilityCheck or self.Settings.VisibilityCheck,
-            AlwaysOnTop = customOptions.AlwaysOnTop ~= nil and customOptions.AlwaysOnTop or self.Settings.AlwaysOnTop
-        },
-        Drawings = {
-            Box = self:CreateDrawing("Square", {
-                Visible = false,
-                Color = customOptions.BoxColor or self.Settings.BoxColor,
-                Thickness = customOptions.BoxThickness or self.Settings.BoxThickness,
-                Transparency = customOptions.BoxTransparency or self.Settings.BoxTransparency,
-                Filled = customOptions.BoxFilled ~= nil and customOptions.BoxFilled or self.Settings.BoxFilled,
-                ZIndex = self.Settings.ZIndex
-            }),
-            BoxOutline = self:CreateDrawing("Square", {
-                Visible = false,
-                Color = self.Settings.BoxOutlineColor,
-                Thickness = (customOptions.BoxThickness or self.Settings.BoxThickness) + 2,
-                Transparency = self.Settings.BoxOutlineTransparency,
-                Filled = false,
-                ZIndex = self.Settings.ZIndex - 1
-            }),
-            BoxFill = self:CreateDrawing("Square", {
-                Visible = false,
-                Color = customOptions.BoxColor or self.Settings.BoxColor,
-                Transparency = self.Settings.BoxFilledTransparency,
-                Filled = true,
-                ZIndex = self.Settings.ZIndex - 2
-            }),
-            BoxCorners = {},
-            Box3D = {},
-            Name = self:CreateDrawing("Text", {
-                Visible = false,
-                Color = customOptions.NameColor or self.Settings.NameColor,
-                Transparency = customOptions.NameTransparency or self.Settings.NameTransparency,
-                Size = customOptions.NameSize or self.Settings.NameSize,
-                Center = true,
-                Outline = self.Settings.NameOutline,
-                OutlineColor = self.Settings.NameOutlineColor,
-                Font = self.Settings.NameFont,
-                ZIndex = self.Settings.ZIndex
-            }),
-            Distance = self:CreateDrawing("Text", {
-                Visible = false,
-                Color = customOptions.DistanceColor or self.Settings.DistanceColor,
-                Transparency = customOptions.DistanceTransparency or self.Settings.DistanceTransparency,
-                Size = customOptions.DistanceSize or self.Settings.DistanceSize,
-                Center = true,
-                Outline = self.Settings.DistanceOutline,
-                OutlineColor = self.Settings.DistanceOutlineColor,
-                Font = self.Settings.DistanceFont,
-                ZIndex = self.Settings.ZIndex
-            }),
-            Tracer = self:CreateDrawing("Line", {
-                Visible = false,
-                Color = customOptions.TracerColor or self.Settings.TracerColor,
-                Thickness = customOptions.TracerThickness or self.Settings.TracerThickness,
-                Transparency = customOptions.TracerTransparency or self.Settings.TracerTransparency,
-                ZIndex = self.Settings.ZIndex
-            }),
-            TracerOutline = self:CreateDrawing("Line", {
-                Visible = false,
-                Color = self.Settings.TracerOutlineColor,
-                Thickness = (customOptions.TracerThickness or self.Settings.TracerThickness) + 2,
-                Transparency = self.Settings.TracerOutlineTransparency,
-                ZIndex = self.Settings.ZIndex - 1
-            }),
-            CustomText = self:CreateDrawing("Text", {
-                Visible = false,
-                Color = customOptions.CustomTextColor or self.Settings.CustomTextColor,
-                Transparency = customOptions.CustomTextTransparency or self.Settings.CustomTextTransparency,
-                Size = customOptions.CustomTextSize or self.Settings.CustomTextSize,
-                Center = true,
-                Outline = self.Settings.CustomTextOutline,
-                OutlineColor = self.Settings.CustomTextOutlineColor,
-                Font = self.Settings.CustomTextFont,
-                ZIndex = self.Settings.ZIndex
-            }),
-            Chams = customOptions.ChamsEnabled and self:CreateHighlight() or nil
-        }
-    }
-    
-    -- Create corner box drawings if needed
-    for i = 1, 8 do
-        objectData.Drawings.BoxCorners[i] = {
-            Line = self:CreateDrawing("Line", {
-                Visible = false,
-                Color = customOptions.BoxColor or self.Settings.BoxColor,
-                Thickness = customOptions.BoxThickness or self.Settings.BoxThickness,
-                Transparency = customOptions.BoxTransparency or self.Settings.BoxTransparency,
-                ZIndex = self.Settings.ZIndex
-            }),
-            Outline = self:CreateDrawing("Line", {
-                Visible = false,
-                Color = self.Settings.BoxOutlineColor,
-                Thickness = (customOptions.BoxThickness or self.Settings.BoxThickness) + 2,
-                Transparency = self.Settings.BoxOutlineTransparency,
-                ZIndex = self.Settings.ZIndex - 1
-            })
-        }
-    end
-    
-    -- Create 3D box drawings if needed
-    for i = 1, 12 do
-        objectData.Drawings.Box3D[i] = {
-            Line = self:CreateDrawing("Line", {
-                Visible = false,
-                Color = customOptions.BoxColor or self.Settings.BoxColor,
-                Thickness = customOptions.BoxThickness or self.Settings.BoxThickness,
-                Transparency = customOptions.BoxTransparency or self.Settings.BoxTransparency,
-                ZIndex = self.Settings.ZIndex
-            }),
-            Outline = self:CreateDrawing("Line", {
-                Visible = false,
-                Color = self.Settings.BoxOutlineColor,
-                Thickness = (customOptions.BoxThickness or self.Settings.BoxThickness) + 2,
-                Transparency = self.Settings.BoxOutlineTransparency,
-                ZIndex = self.Settings.ZIndex - 1
-            })
-        }
-    end
-    
-    -- Set up chams if enabled
-    if objectData.Drawings.Chams then
-        objectData.Drawings.Chams.Adornee = object
-        objectData.Drawings.Chams.FillColor = customOptions.ChamsColor or self.Settings.ChamsColor
-        objectData.Drawings.Chams.FillTransparency = customOptions.ChamsTransparency or self.Settings.ChamsTransparency
-        objectData.Drawings.Chams.OutlineColor = self.Settings.ChamsOutlineColor
-        objectData.Drawings.Chams.OutlineTransparency = self.Settings.ChamsOutlineTransparency
-        objectData.Drawings.Chams.DepthMode = Enum.HighlightDepthMode.Occluded
-        objectData.Drawings.Chams.Enabled = true
-    end
-    
-    -- Store the object data
-    self.Objects[objectId] = objectData
-    
-    -- Create update function for this object
-    self:UpdateObjectESP(object)
-    
-    return objectId
+        -- Update object ESP - This is the important part that needs to be fixed
+        for objectId, objectData in pairs(self.Objects) do
+            -- Check if object still exists
+            if objectData.Object and objectData.Object.Parent then
+                -- Call UpdateObjectESP directly with the object
+                self:UpdateObjectESP(objectData.Object)
+            else
+                -- Remove ESP for objects that no longer exist
+                self:RemoveObjectESPById(objectId)
+            end
+        end
+    end)
+
+    -- Rest of the Init function remains the same...
 end
 
--- Function to update ESP for an object
+-- Improve the UpdateObjectESP function to better handle position updates
+
 function ESP:UpdateObjectESP(object)
     local objectId = nil
     local objectData = nil
@@ -2147,11 +1975,11 @@ function ESP:UpdateObjectESP(object)
     
     -- Check if object still exists
     if not object or not object.Parent then
-        self:RemoveObjectESP(object)
+        self:RemoveObjectESPById(objectId)
         return
     end
     
-    -- Get object position
+    -- Get object position - improved to handle different object types
     local position
     if object:IsA("Model") and object.PrimaryPart then
         position = object.PrimaryPart.Position
@@ -2164,30 +1992,7 @@ function ESP:UpdateObjectESP(object)
             position = part.Position
         else
             -- If no position can be determined, hide ESP
-            for _, drawing in pairs(objectData.Drawings) do
-                if type(drawing) == "table" then
-                    if drawing.Line then
-                        drawing.Line.Visible = false
-                        drawing.Outline.Visible = false
-                    else
-                        for _, subDrawing in pairs(drawing) do
-                            if type(subDrawing) == "table" then
-                                subDrawing.Line.Visible = false
-                                subDrawing.Outline.Visible = false
-                            elseif subDrawing ~= objectData.Drawings.Chams then
-                                subDrawing.Visible = false
-                            end
-                        end
-                    end
-                elseif drawing ~= objectData.Drawings.Chams then
-                    drawing.Visible = false
-                end
-            end
-            
-            if objectData.Drawings.Chams then
-                objectData.Drawings.Chams.Enabled = false
-            end
-            
+            self:HideObjectESP(objectData)
             return
         end
     end
@@ -2196,30 +2001,7 @@ function ESP:UpdateObjectESP(object)
     local distance = self:GetDistance(position)
     if distance > objectData.Options.MaxDistance then
         -- Hide ESP if too far
-        for _, drawing in pairs(objectData.Drawings) do
-            if type(drawing) == "table" then
-                if drawing.Line then
-                    drawing.Line.Visible = false
-                    drawing.Outline.Visible = false
-                else
-                    for _, subDrawing in pairs(drawing) do
-                        if type(subDrawing) == "table" then
-                            subDrawing.Line.Visible = false
-                            subDrawing.Outline.Visible = false
-                        elseif subDrawing ~= objectData.Drawings.Chams then
-                            subDrawing.Visible = false
-                        end
-                    end
-                end
-            elseif drawing ~= objectData.Drawings.Chams then
-                drawing.Visible = false
-            end
-        end
-        
-        if objectData.Drawings.Chams then
-            objectData.Drawings.Chams.Enabled = false
-        end
-        
+        self:HideObjectESP(objectData)
         return
     end
     
@@ -2478,107 +2260,32 @@ function ESP:UpdateObjectESP(object)
     end
 end
 
--- Function to remove ESP from an object
-function ESP:RemoveObjectESP(object)
-    local objectId = nil
-    
-    -- Find the object ID
-    for id, data in pairs(self.Objects) do
-        if data.Object == object then
-            objectId = id
-            break
-        end
-    end
-    
-    if objectId then
-        self:RemoveObjectESPById(objectId)
-        return true
-    end
-    
-    return false
-end
-
--- Function to remove ESP by ID
-function ESP:RemoveObjectESPById(objectId)
-    local objectData = self.Objects[objectId]
-    
-    if objectData then
-        for _, drawing in pairs(objectData.Drawings) do
-            if type(drawing) == "table" then
-                if drawing.Line then
-                    self:RemoveDrawing(drawing.Line)
-                    self:RemoveDrawing(drawing.Outline)
-                else
-                    for _, subDrawing in pairs(drawing) do
-                        if type(subDrawing) == "table" then
-                            self:RemoveDrawing(subDrawing.Line)
-                            self:RemoveDrawing(subDrawing.Outline)
-                        elseif subDrawing ~= objectData.Drawings.Chams then
-                            self:RemoveDrawing(subDrawing)
-                        end
+-- Add a helper function to hide object ESP
+function ESP:HideObjectESP(objectData)
+    for _, drawing in pairs(objectData.Drawings) do
+        if type(drawing) == "table" then
+            if drawing.Line then
+                drawing.Line.Visible = false
+                drawing.Outline.Visible = false
+            else
+                for _, subDrawing in pairs(drawing) do
+                    if type(subDrawing) == "table" then
+                        subDrawing.Line.Visible = false
+                        subDrawing.Outline.Visible = false
+                    elseif subDrawing ~= objectData.Drawings.Chams then
+                        subDrawing.Visible = false
                     end
                 end
-            elseif drawing ~= objectData.Drawings.Chams then
-                self:RemoveDrawing(drawing)
             end
+        elseif drawing ~= objectData.Drawings.Chams then
+            drawing.Visible = false
         end
-        
-        if objectData.Drawings.Chams then
-            self:RemoveHighlight(objectData.Drawings.Chams)
-        end
-        
-        self.Objects[objectId] = nil
-        return true
     end
     
-    return false
-end
-
--- Function to update settings for an object ESP
-function ESP:UpdateObjectESPSettings(objectId, newSettings)
-    local objectData = self.Objects[objectId]
-    
-    if objectData and newSettings then
-        for setting, value in pairs(newSettings) do
-            objectData.Options[setting] = value
-        end
-        
-        return true
+    if objectData.Drawings.Chams then
+        objectData.Drawings.Chams.Enabled = false
     end
-    
-    return false
 end
-
-function ESP:Init()
-    self.Connections.PlayerAdded = Players.PlayerAdded:Connect(function(player)
-        self:CreatePlayerESP(player)
-    end)
-
-    self.Connections.PlayerRemoving = Players.PlayerRemoving:Connect(function(player)
-        self:RemovePlayerESP(player)
-    end)
-
-    self.Connections.RenderStepped = RunService.RenderStepped:Connect(function()
-        if not self.Enabled then return end
-        
-        if self.Settings.RainbowMode then
-            self._rainbow = (self._rainbow + self.Settings.RainbowSpeed * 0.01) % 1
-        end
-        
-        self._pulse = (self._pulse + 0.05) % (mathpi * 2)
-        
-        for player, playerData in pairs(self.Players) do
-            self:UpdatePlayerESP(player)
-        end
-        
-        for objectId, objectData in pairs(self.Objects) do
-            if objectData.Object and objectData.Object.Parent then
-                self:UpdateObjectESP(objectData.Object)
-            else
-                self:RemoveObjectESP(objectData.Object)
-            end
-        end
-    end)
 
     self.Connections.InputBegan = UserInputService.InputBegan:Connect(function(input, gameProcessed)
         if gameProcessed then return end

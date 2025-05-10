@@ -1,4 +1,3 @@
-
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
@@ -832,7 +831,8 @@ function ESP:HidePlayerESP(playerData)
     if playerData.Drawings.Box3D then
         for _, line in pairs(playerData.Drawings.Box3D) do
             if line.Line then line.Line.Visible = false end
-            if line.Outline then line.Outline.Visible = false end
+            
+if line.Outline then line.Outline.Visible = false end
         end
     end
 
@@ -1358,7 +1358,7 @@ function ESP:UpdatePlayerESP(player)
                 
                 if cornerPoints then
                     for i, points in ipairs(cornerPoints) do
-                        if i <= #playerData.Drawings.BoxCorners then
+                        if i &lt;= #playerData.Drawings.BoxCorners then
                             playerData.Drawings.BoxCorners[i].Line.From = points[1]
                             playerData.Drawings.BoxCorners[i].Line.To = points[2]
                             playerData.Drawings.BoxCorners[i].Line.Color = color
@@ -1385,7 +1385,7 @@ function ESP:UpdatePlayerESP(player)
                     }
                     
                     for i, edge in ipairs(edges) do
-                        if i <= #playerData.Drawings.Box3D then
+                        if i &lt;= #playerData.Drawings.Box3D then
                             playerData.Drawings.Box3D[i].Line.From = corners3D[edge[1]]
                             playerData.Drawings.Box3D[i].Line.To = corners3D[edge[2]]
                             playerData.Drawings.Box3D[i].Line.Color = color
@@ -1395,9 +1395,8 @@ function ESP:UpdatePlayerESP(player)
                             if self.Settings.BoxOutline then
                                 playerData.Drawings.Box3D[i].Outline.From = corners3D[edge[1]]
                                 playerData.Drawings.Box3D[i].Outline.To = corners3D[edge[2]]
-                                playerData.Drawings.Box3D[i].Outline.Transparency = transparency * self.Settings.BoxOutlineTransparency
-                                playerData.Drawings.Box3D[i].Outline.Visible = true
-                            end
+                            playerData.Drawings.Box3D[i].Outline.Transparency = transparency * self.Settings.BoxOutlineTransparency
+                            playerData.Drawings.Box3D[i].Outline.Visible = true
                         end
                     end
                 end
@@ -1586,7 +1585,6 @@ function ESP:UpdatePlayerESP(player)
                 end
                 
                 playerData.Drawings.HealthBar.Position = healthPosition
-                                playerData.Drawings.HealthBar.Position = healthPosition
                 playerData.Drawings.HealthBar.Size = Vector2new(barWidth, barHeight)
                 playerData.Drawings.HealthBarOutline.Position = healthPosition
                 playerData.Drawings.HealthBarOutline.Size = Vector2new(boxSize.X, barHeight)
@@ -1700,12 +1698,6 @@ function ESP:UpdatePlayerESP(player)
                 highlight.OutlineTransparency = 1 - (transparency * (1 - self.Settings.ChamsOutlineTransparency))
             else
                 highlight.OutlineTransparency = 1
-            end
-            
-            if self.Settings.ChamsDepthMode == "Occluded" then
-                highlight.DepthMode = Enum.HighlightDepthMode.Occluded
-            elseif self.Settings.ChamsDepthMode == "AlwaysOnTop" then
-                highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
             end
             
             if self.Settings.ChamsVisibleOnly and not isVisible then
@@ -1956,7 +1948,7 @@ function ESP:UpdatePlayerESP(player)
         
         if hitboxPoints then
             for i, point in ipairs(hitboxPoints) do
-                if i <= #playerData.Drawings.Hitbox then
+                if i &lt;= #playerData.Drawings.Hitbox then
                     playerData.Drawings.Hitbox[i].Position = point
                     playerData.Drawings.Hitbox[i].Color = color
                     playerData.Drawings.Hitbox[i].Transparency = transparency * self.Settings.HitboxTransparency
@@ -2337,7 +2329,7 @@ function ESP:UpdateObjectESP(objectId)
                 }
                 
                 for i, edge in ipairs(edges) do
-                    if i <= #objectData.Drawings.Box3D then
+                    if i &lt;= #objectData.Drawings.Box3D then
                         objectData.Drawings.Box3D[i].Line.From = corners3D[edge[1]]
                         objectData.Drawings.Box3D[i].Line.To = corners3D[edge[2]]
                         objectData.Drawings.Box3D[i].Line.Color = objectData.Options.BoxColor
@@ -2356,7 +2348,7 @@ function ESP:UpdateObjectESP(objectId)
             
             if cornerPoints then
                 for i, points in ipairs(cornerPoints) do
-                    if i <= #objectData.Drawings.BoxCorners then
+                    if i &lt;= #objectData.Drawings.BoxCorners then
                         objectData.Drawings.BoxCorners[i].Line.From = points[1]
                         objectData.Drawings.BoxCorners[i].Line.To = points[2]
                         objectData.Drawings.BoxCorners[i].Line.Color = objectData.Options.BoxColor
@@ -3260,6 +3252,18 @@ function ESP:ResetSettings()
         
         DistanceEnabled = false,
         DistanceColor = Color3fromRGB(255, 255, 255),
+        NameTransparency = 0.7,
+        NameOutline = true,
+        NameOutlineColor = Color3fromRGB(0, 0, 0),
+        NameOutlineTransparency = 0.5,
+        NameSize = 14,
+        NameFont = 2,
+        NamePosition = "top",
+        NameYOffset = -15,
+        NameXOffset = 0,
+        
+        DistanceEnabled = false,
+        DistanceColor = Color3fromRGB(255, 255, 255),
         DistanceTransparency = 0.7,
         DistanceOutline = true,
         DistanceOutlineColor = Color3fromRGB(0, 0, 0),
@@ -3423,3 +3427,5 @@ function ESP:ResetSettings()
 end
 
 return ESP
+
+print(ESP)

@@ -1358,7 +1358,7 @@ function ESP:UpdatePlayerESP(player)
                 
                 if cornerPoints then
                     for i, points in ipairs(cornerPoints) do
-                        if i &lt;= #playerData.Drawings.BoxCorners then
+                        if i <= #playerData.Drawings.BoxCorners then
                             playerData.Drawings.BoxCorners[i].Line.From = points[1]
                             playerData.Drawings.BoxCorners[i].Line.To = points[2]
                             playerData.Drawings.BoxCorners[i].Line.Color = color
@@ -1385,7 +1385,7 @@ function ESP:UpdatePlayerESP(player)
                     }
                     
                     for i, edge in ipairs(edges) do
-                        if i &lt;= #playerData.Drawings.Box3D then
+                        if i <= #playerData.Drawings.Box3D then
                             playerData.Drawings.Box3D[i].Line.From = corners3D[edge[1]]
                             playerData.Drawings.Box3D[i].Line.To = corners3D[edge[2]]
                             playerData.Drawings.Box3D[i].Line.Color = color
@@ -1948,7 +1948,7 @@ function ESP:UpdatePlayerESP(player)
         
         if hitboxPoints then
             for i, point in ipairs(hitboxPoints) do
-                if i &lt;= #playerData.Drawings.Hitbox then
+                if i <= #playerData.Drawings.Hitbox then
                     playerData.Drawings.Hitbox[i].Position = point
                     playerData.Drawings.Hitbox[i].Color = color
                     playerData.Drawings.Hitbox[i].Transparency = transparency * self.Settings.HitboxTransparency
@@ -2013,6 +2013,7 @@ function ESP:GetObjectPosition(object)
 
     -- If all else fails, return nil
     return nil
+end
 end
 
 -- Completely rewrite the AddObjectESP function
@@ -2329,7 +2330,7 @@ function ESP:UpdateObjectESP(objectId)
                 }
                 
                 for i, edge in ipairs(edges) do
-                    if i &lt;= #objectData.Drawings.Box3D then
+                    if i <= #objectData.Drawings.Box3D then
                         objectData.Drawings.Box3D[i].Line.From = corners3D[edge[1]]
                         objectData.Drawings.Box3D[i].Line.To = corners3D[edge[2]]
                         objectData.Drawings.Box3D[i].Line.Color = objectData.Options.BoxColor
@@ -2348,7 +2349,7 @@ function ESP:UpdateObjectESP(objectId)
             
             if cornerPoints then
                 for i, points in ipairs(cornerPoints) do
-                    if i &lt;= #objectData.Drawings.BoxCorners then
+                    if i <= #objectData.Drawings.BoxCorners then
                         objectData.Drawings.BoxCorners[i].Line.From = points[1]
                         objectData.Drawings.BoxCorners[i].Line.To = points[2]
                         objectData.Drawings.BoxCorners[i].Line.Color = objectData.Options.BoxColor
@@ -3428,4 +3429,3 @@ end
 
 return ESP
 
-print(ESP)

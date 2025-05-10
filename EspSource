@@ -805,20 +805,20 @@ end
 -- Improved HidePlayerESP function to ensure all drawings are properly hidden
 function ESP:HidePlayerESP(playerData)
     if not playerData or not playerData.Drawings then return end
-    
+
     -- Hide box drawings
     if playerData.Drawings.Box then
         playerData.Drawings.Box.Visible = false
     end
-    
+
     if playerData.Drawings.BoxOutline then
         playerData.Drawings.BoxOutline.Visible = false
     end
-    
+
     if playerData.Drawings.BoxFill then
         playerData.Drawings.BoxFill.Visible = false
     end
-    
+
     -- Hide box corners
     if playerData.Drawings.BoxCorners then
         for _, corner in pairs(playerData.Drawings.BoxCorners) do
@@ -826,7 +826,7 @@ function ESP:HidePlayerESP(playerData)
             if corner.Outline then corner.Outline.Visible = false end
         end
     end
-    
+
     -- Hide 3D box
     if playerData.Drawings.Box3D then
         for _, line in pairs(playerData.Drawings.Box3D) do
@@ -834,71 +834,71 @@ function ESP:HidePlayerESP(playerData)
             if line.Outline then line.Outline.Visible = false end
         end
     end
-    
+
     -- Hide text elements
     if playerData.Drawings.Name then
         playerData.Drawings.Name.Visible = false
     end
-    
+
     if playerData.Drawings.Distance then
         playerData.Drawings.Distance.Visible = false
     end
-    
+
     if playerData.Drawings.Tool then
         playerData.Drawings.Tool.Visible = false
     end
-    
+
     if playerData.Drawings.State then
         playerData.Drawings.State.Visible = false
     end
-    
+
     if playerData.Drawings.CustomText then
         playerData.Drawings.CustomText.Visible = false
     end
-    
+
     -- Hide health bar
     if playerData.Drawings.HealthBar then
         playerData.Drawings.HealthBar.Visible = false
     end
-    
+
     if playerData.Drawings.HealthBarOutline then
         playerData.Drawings.HealthBarOutline.Visible = false
     end
-    
+
     -- Hide tracer
     if playerData.Drawings.Tracer then
         playerData.Drawings.Tracer.Visible = false
     end
-    
+
     if playerData.Drawings.TracerOutline then
         playerData.Drawings.TracerOutline.Visible = false
     end
-    
+
     -- Hide dashed tracer
     if playerData.Drawings.TracerDashed then
         for _, line in pairs(playerData.Drawings.TracerDashed) do
             if line then line.Visible = false end
         end
     end
-    
+
     -- Hide head dot
     if playerData.Drawings.HeadDot then
         playerData.Drawings.HeadDot.Visible = false
     end
-    
+
     if playerData.Drawings.HeadDotOutline then
         playerData.Drawings.HeadDotOutline.Visible = false
     end
-    
+
     -- Hide aim point
     if playerData.Drawings.AimPoint then
         playerData.Drawings.AimPoint.Visible = false
     end
-    
+
     if playerData.Drawings.AimPointOutline then
         playerData.Drawings.AimPointOutline.Visible = false
     end
-    
+
     -- Hide skeleton
     if playerData.Drawings.Skeleton then
         for _, bone in pairs(playerData.Drawings.Skeleton) do
@@ -906,21 +906,21 @@ function ESP:HidePlayerESP(playerData)
             if bone.Outline then bone.Outline.Visible = false end
         end
     end
-    
+
     -- Hide dashed skeleton
     if playerData.Drawings.SkeletonDashed then
         for _, line in pairs(playerData.Drawings.SkeletonDashed) do
             if line then line.Visible = false end
         end
     end
-    
+
     -- Hide hitbox
     if playerData.Drawings.Hitbox then
         for _, point in pairs(playerData.Drawings.Hitbox) do
             if point then point.Visible = false end
         end
     end
-    
+
     -- Hide chams
     if playerData.Drawings.Chams then
         playerData.Drawings.Chams.Enabled = false
@@ -1580,7 +1580,12 @@ function ESP:UpdatePlayerESP(player)
                 else
                     healthPosition = Vector2new(
                         topLeft.X + self.Settings.HealthXOffset,
-                        bottomRight.Y + self.Settings.HealthYOffsetHere's the complete ESP library source code with the fixes implemented to ensure proper cleanup when toggling ESP on and off:
+                        bottomRight.Y + self.Settings.HealthYOffset
+                    )
+                end
+                
+                playerData.Drawings.HealthBar.Position = healthPosition
+                playerData.Drawings.HealthYou're right, there are syntax issues in the ESP library source code. Let me provide a fixed version with proper Lua syntax:
 
 ```lua type="code"
 local Players = game:GetService("Players")
@@ -2390,20 +2395,20 @@ end
 -- Improved HidePlayerESP function to ensure all drawings are properly hidden
 function ESP:HidePlayerESP(playerData)
     if not playerData or not playerData.Drawings then return end
-    
+
     -- Hide box drawings
     if playerData.Drawings.Box then
         playerData.Drawings.Box.Visible = false
     end
-    
+
     if playerData.Drawings.BoxOutline then
         playerData.Drawings.BoxOutline.Visible = false
     end
-    
+
     if playerData.Drawings.BoxFill then
         playerData.Drawings.BoxFill.Visible = false
     end
-    
+
     -- Hide box corners
     if playerData.Drawings.BoxCorners then
         for _, corner in pairs(playerData.Drawings.BoxCorners) do
@@ -2411,7 +2416,7 @@ function ESP:HidePlayerESP(playerData)
             if corner.Outline then corner.Outline.Visible = false end
         end
     end
-    
+
     -- Hide 3D box
     if playerData.Drawings.Box3D then
         for _, line in pairs(playerData.Drawings.Box3D) do
@@ -2419,71 +2424,71 @@ function ESP:HidePlayerESP(playerData)
             if line.Outline then line.Outline.Visible = false end
         end
     end
-    
+
     -- Hide text elements
     if playerData.Drawings.Name then
         playerData.Drawings.Name.Visible = false
     end
-    
+
     if playerData.Drawings.Distance then
         playerData.Drawings.Distance.Visible = false
     end
-    
+
     if playerData.Drawings.Tool then
         playerData.Drawings.Tool.Visible = false
     end
-    
+
     if playerData.Drawings.State then
         playerData.Drawings.State.Visible = false
     end
-    
+
     if playerData.Drawings.CustomText then
         playerData.Drawings.CustomText.Visible = false
     end
-    
+
     -- Hide health bar
     if playerData.Drawings.HealthBar then
         playerData.Drawings.HealthBar.Visible = false
     end
-    
+
     if playerData.Drawings.HealthBarOutline then
         playerData.Drawings.HealthBarOutline.Visible = false
     end
-    
+
     -- Hide tracer
     if playerData.Drawings.Tracer then
         playerData.Drawings.Tracer.Visible = false
     end
-    
+
     if playerData.Drawings.TracerOutline then
         playerData.Drawings.TracerOutline.Visible = false
     end
-    
+
     -- Hide dashed tracer
     if playerData.Drawings.TracerDashed then
         for _, line in pairs(playerData.Drawings.TracerDashed) do
             if line then line.Visible = false end
         end
     end
-    
+
     -- Hide head dot
     if playerData.Drawings.HeadDot then
         playerData.Drawings.HeadDot.Visible = false
     end
-    
+
     if playerData.Drawings.HeadDotOutline then
         playerData.Drawings.HeadDotOutline.Visible = false
     end
-    
+
     -- Hide aim point
     if playerData.Drawings.AimPoint then
         playerData.Drawings.AimPoint.Visible = false
     end
-    
+
     if playerData.Drawings.AimPointOutline then
         playerData.Drawings.AimPointOutline.Visible = false
     end
-    
+
     -- Hide skeleton
     if playerData.Drawings.Skeleton then
         for _, bone in pairs(playerData.Drawings.Skeleton) do
@@ -2491,21 +2496,21 @@ function ESP:HidePlayerESP(playerData)
             if bone.Outline then bone.Outline.Visible = false end
         end
     end
-    
+
     -- Hide dashed skeleton
     if playerData.Drawings.SkeletonDashed then
         for _, line in pairs(playerData.Drawings.SkeletonDashed) do
             if line then line.Visible = false end
         end
     end
-    
+
     -- Hide hitbox
     if playerData.Drawings.Hitbox then
         for _, point in pairs(playerData.Drawings.Hitbox) do
             if point then point.Visible = false end
         end
     end
-    
+
     -- Hide chams
     if playerData.Drawings.Chams then
         playerData.Drawings.Chams.Enabled = false
@@ -3170,6 +3175,7 @@ function ESP:UpdatePlayerESP(player)
                 end
                 
                 playerData.Drawings.HealthBar.Position = healthPosition
+                                playerData.Drawings.HealthBar.Position = healthPosition
                 playerData.Drawings.HealthBar.Size = Vector2new(barWidth, barHeight)
                 playerData.Drawings.HealthBarOutline.Position = healthPosition
                 playerData.Drawings.HealthBarOutline.Size = Vector2new(boxSize.X, barHeight)
@@ -4075,16 +4081,16 @@ end
 -- Improved HideObjectESP function to ensure all drawings are properly hidden
 function ESP:HideObjectESP(objectData)
     if not objectData or not objectData.Drawings then return end
-    
+
     -- Hide box drawings
     if objectData.Drawings.Box then
         objectData.Drawings.Box.Visible = false
     end
-    
+
     if objectData.Drawings.BoxOutline then
         objectData.Drawings.BoxOutline.Visible = false
     end
-    
+
     -- Hide box corners
     if objectData.Drawings.BoxCorners then
         for _, corner in pairs(objectData.Drawings.BoxCorners) do
@@ -4092,7 +4098,7 @@ function ESP:HideObjectESP(objectData)
             if corner.Outline then corner.Outline.Visible = false end
         end
     end
-    
+
     -- Hide 3D box
     if objectData.Drawings.Box3D then
         for _, line in pairs(objectData.Drawings.Box3D) do
@@ -4100,29 +4106,29 @@ function ESP:HideObjectESP(objectData)
             if line.Outline then line.Outline.Visible = false end
         end
     end
-    
+
     -- Hide text elements
     if objectData.Drawings.Name then
         objectData.Drawings.Name.Visible = false
     end
-    
+
     if objectData.Drawings.Distance then
         objectData.Drawings.Distance.Visible = false
     end
-    
+
     if objectData.Drawings.CustomText then
         objectData.Drawings.CustomText.Visible = false
     end
-    
+
     -- Hide tracer
     if objectData.Drawings.Tracer then
         objectData.Drawings.Tracer.Visible = false
     end
-    
+
     if objectData.Drawings.TracerOutline then
         objectData.Drawings.TracerOutline.Visible = false
     end
-    
+
     -- Hide chams
     if objectData.Drawings.Chams then
         objectData.Drawings.Chams.Enabled = false
@@ -4133,7 +4139,7 @@ end
 function ESP:RemoveObjectESPById(objectId)
     local objectData = self.Objects[objectId]
     if not objectData then return end
-    
+
     for _, drawing in pairs(objectData.Drawings) do
         if type(drawing) == "table" then
             if drawing.Line then
@@ -4153,11 +4159,11 @@ function ESP:RemoveObjectESPById(objectId)
             self:RemoveDrawing(drawing)
         end
     end
-    
+
     if objectData.Drawings.Chams then
         self:RemoveHighlight(objectData.Drawings.Chams)
     end
-    
+
     self.Objects[objectId] = nil
 end
 
@@ -4165,24 +4171,24 @@ end
 function ESP:UpdateObjectESPSettings(objectId, newSettings)
     local objectData = self.Objects[objectId]
     if not objectData then return false end
-    
+
     for setting, value in pairs(newSettings) do
         objectData.Options[setting] = value
     end
-    
+
     return true
 end
 
 function ESP:RemoveObjectESP(object)
     local objectId = nil
-    
+
     for id, data in pairs(self.Objects) do
         if data.Object == object then
             objectId = id
             break
         end
     end
-    
+
     if objectId then
         self:RemoveObjectESPById(objectId)
     end
@@ -4192,7 +4198,7 @@ end
 function ESP:SetCustomText(player, textCallback)
     local playerData = self.Players[player]
     if not playerData then return end
-    
+
     playerData.CustomTextCallback = textCallback
     return true
 end
@@ -4203,12 +4209,12 @@ function ESP:ForceCleanupDrawings()
     for _, playerData in pairs(self.Players) do
         self:HidePlayerESP(playerData)
     end
-    
+
     -- Hide all object ESP
     for _, objectData in pairs(self.Objects) do
         self:HideObjectESP(objectData)
     end
-    
+
     -- Set cleanup flag
     self._cleanupRequested = true
 end
@@ -4400,7 +4406,7 @@ function ESP:Destroy()
     self._transitions = {}
     self._lastPositions = {}
     self._lastAliveStates = {}
-}
+end
 
 -- Improved Toggle function to properly hide all drawings when disabled
 function ESP:Toggle(enabled)
@@ -4409,7 +4415,7 @@ function ESP:Toggle(enabled)
     else
         self.Enabled = not self.Enabled
     end
-    
+
     -- When disabling ESP, properly hide all drawings
     if not self.Enabled then
         -- Hide player ESP
@@ -4425,7 +4431,7 @@ function ESP:Toggle(enabled)
         -- Request a cleanup on the next frame to ensure all drawings are hidden
         self._cleanupRequested = true
     end
-    
+
     return self.Enabled
 end
 

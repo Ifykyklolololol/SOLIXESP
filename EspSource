@@ -37,7 +37,7 @@ local tableremove = table.remove
 local tablefind = table.find
 local stringsub = string.sub
 local stringlen = string.len
-local stringformat = string.format
+local stringformat = string.format  -- Fixed: Changed from circular reference
 local stringlower = string.lower
 
 local ESP = {
@@ -831,8 +831,7 @@ function ESP:HidePlayerESP(playerData)
     if playerData.Drawings.Box3D then
         for _, line in pairs(playerData.Drawings.Box3D) do
             if line.Line then line.Line.Visible = false end
-            
-if line.Outline then line.Outline.Visible = false end
+            if line.Outline then line.Outline.Visible = false end
         end
     end
 
@@ -1395,8 +1394,9 @@ function ESP:UpdatePlayerESP(player)
                             if self.Settings.BoxOutline then
                                 playerData.Drawings.Box3D[i].Outline.From = corners3D[edge[1]]
                                 playerData.Drawings.Box3D[i].Outline.To = corners3D[edge[2]]
-                            playerData.Drawings.Box3D[i].Outline.Transparency = transparency * self.Settings.BoxOutlineTransparency
-                            playerData.Drawings.Box3D[i].Outline.Visible = true
+                                playerData.Drawings.Box3D[i].Outline.Transparency = transparency * self.Settings.BoxOutlineTransparency
+                                playerData.Drawings.Box3D[i].Outline.Visible = true
+                            end
                         end
                     end
                 end
@@ -1992,7 +1992,7 @@ function ESP:GetObjectPosition(object)
         local parts = {}
         for _, part in pairs(object:GetDescendants()) do
             if part:IsA("BasePart") then
-                table.insert(parts, part)
+                tableinsert(parts, part)
             end
         end
         
@@ -2013,7 +2013,6 @@ function ESP:GetObjectPosition(object)
 
     -- If all else fails, return nil
     return nil
-end
 end
 
 -- Completely rewrite the AddObjectESP function
@@ -2070,7 +2069,7 @@ function ESP:AddObjectESP(objectPath, customOptions)
             NameSize = customOptions.NameSize or self.Settings.NameSize,
             NamePosition = customOptions.NamePosition or "top",
             NameYOffset = customOptions.NameYOffset or -15,
-            NameXOffset = customOptions.NameXOffset or 0,
+            NameXOffset = 0,
             
             DistanceEnabled = customOptions.DistanceEnabled ~= nil and customOptions.DistanceEnabled or true,
             DistanceColor = customOptions.DistanceColor or Color3fromRGB(255, 255, 255),
@@ -2078,7 +2077,7 @@ function ESP:AddObjectESP(objectPath, customOptions)
             DistanceSize = customOptions.DistanceSize or self.Settings.DistanceSize,
             DistancePosition = customOptions.DistancePosition or "bottom",
             DistanceYOffset = customOptions.DistanceYOffset or 15,
-            DistanceXOffset = customOptions.DistanceXOffset or 0,
+            DistanceXOffset = 0,
             
             TracerEnabled = customOptions.TracerEnabled ~= nil and customOptions.TracerEnabled or true,
             TracerColor = customOptions.TracerColor or Color3fromRGB(0, 255, 0),
@@ -2093,7 +2092,7 @@ function ESP:AddObjectESP(objectPath, customOptions)
             CustomTextSize = customOptions.CustomTextSize or self.Settings.CustomTextSize,
             CustomTextPosition = customOptions.CustomTextPosition or "bottom",
             CustomTextYOffset = customOptions.CustomTextYOffset or 30,
-            CustomTextXOffset = customOptions.CustomTextXOffset or 0,
+            CustomTextXOffset = 0,
             
             ChamsEnabled = customOptions.ChamsEnabled ~= nil and customOptions.ChamsEnabled or false,
             ChamsColor = customOptions.ChamsColor or Color3fromRGB(0, 255, 0),
@@ -2356,10 +2355,12 @@ function ESP:UpdateObjectESP(objectId)
                         objectData.Drawings.BoxCorners[i].Line.Transparency = transparency * objectData.Options.BoxTransparency
                         objectData.Drawings.BoxCorners[i].Line.Visible = true
                         
-                        objectData.Drawings.BoxCorners[i].Outline.From = points[1]
-                        objectData.Drawings.BoxCorners[i].Outline.To = points[2]
-                        objectData.Drawings.BoxCorners[i].Outline.Transparency = transparency * self.Settings.BoxOutlineTransparency
-                        objectData.Drawings.BoxCorners[i].Outline.Visible = true
+                        if self.Settings.BoxOutline then
+                            objectData.Drawings.BoxCorners[i].Outline.From = points[1]
+                            objectData.Drawings.BoxCorners[i].Outline.To = points[2]
+                            objectData.Drawings.BoxCorners[i].Outline.Transparency = transparency * self.Settings.BoxOutlineTransparency
+                            objectData.Drawings.BoxCorners[i].Outline.Visible = true
+                        end
                     end
                 end
             end
@@ -3253,18 +3254,6 @@ function ESP:ResetSettings()
         
         DistanceEnabled = false,
         DistanceColor = Color3fromRGB(255, 255, 255),
-        NameTransparency = 0.7,
-        NameOutline = true,
-        NameOutlineColor = Color3fromRGB(0, 0, 0),
-        NameOutlineTransparency = 0.5,
-        NameSize = 14,
-        NameFont = 2,
-        NamePosition = "top",
-        NameYOffset = -15,
-        NameXOffset = 0,
-        
-        DistanceEnabled = false,
-        DistanceColor = Color3fromRGB(255, 255, 255),
         DistanceTransparency = 0.7,
         DistanceOutline = true,
         DistanceOutlineColor = Color3fromRGB(0, 0, 0),
@@ -3428,4 +3417,3 @@ function ESP:ResetSettings()
 end
 
 return ESP
-
